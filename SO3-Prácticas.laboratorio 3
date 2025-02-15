@@ -1,0 +1,96 @@
+📌 Práctica 1: Configurar GRUB y recuperación de root
+
+1️⃣ Cambiar el tiempo de espera en GRUB a 20 segundos
+-----------------------------------------------------
+sudo nano /etc/default/grub
+
+# Buscar la línea:
+GRUB_TIMEOUT=5
+
+# Reemplazar con:
+GRUB_TIMEOUT=20
+
+# Guardar cambios y actualizar GRUB:
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+2️⃣ Método para recuperar la contraseña de root
+-----------------------------------------------------
+# Reiniciar la máquina y en el menú de GRUB:
+1. Presiona 'e' en la entrada de Linux.
+2. Busca la línea que inicia con 'linux16' o 'linux'.
+3. Agrega al final:
+   rw init=/bin/bash
+4. Presiona 'Ctrl + X' para arrancar en modo rescate.
+5. Cambia la contraseña de root:
+   passwd root
+6. Reinicia:
+   exec /sbin/init
+
+
+📌 Práctica 2: Scripts de Backup y Guardado de ifconfig
+
+1️⃣ Script para Backup con TAR (backup.sh)
+-----------------------------------------------------
+#!/bin/bash
+
+# Definir la fecha y hora actual
+FECHA=$(date +"%d-%m-%Y_%H-%M")
+
+# Crear el backup
+tar -czf /home/$USER/backup_$FECHA.tar.gz /home/$USER
+
+echo "Backup creado en /home/$USER/backup_$FECHA.tar.gz"
+
+# Dar permisos de ejecución:
+chmod +x backup.sh
+
+
+2️⃣ Script para guardar ifconfig (guardar_ifconfig.sh)
+-----------------------------------------------------
+#!/bin/bash
+
+# Preguntar el nombre del archivo
+echo "Ingrese el nombre del archivo:"
+read NOMBRE_ARCHIVO
+
+# Guardar la salida de ifconfig en el archivo
+ifconfig > ~/Escritorio/$NOMBRE_ARCHIVO.txt
+
+echo "Archivo guardado en ~/Escritorio/$NOMBRE_ARCHIVO.txt"
+
+# Dar permisos de ejecución:
+chmod +x guardar_ifconfig.sh
+
+
+📌 Práctica 3: Configuración de Red y SSH
+
+1️⃣ Configurar VM en modo Bridge
+-----------------------------------------------------
+# En VirtualBox:
+1. Ir a Configuración → Red → Adaptador 1
+2. Seleccionar "Modo puente (Bridge)"
+3. Guardar y arrancar la VM
+
+# Validar conectividad desde Windows:
+ping IP_DEL_SERVIDOR
+
+
+2️⃣ Habilitar SSH
+-----------------------------------------------------
+sudo systemctl enable --now sshd
+
+# Conectarse desde Windows:
+ssh usuario@IP_DEL_SERVIDOR
+
+
+3️⃣ Configurar acceso con clave pública
+-----------------------------------------------------
+# Generar clave en Windows:
+ssh-keygen -t rsa -b 4096
+
+# Copiar clave pública al servidor:
+scp ~/.ssh/id_rsa.pub usuario@IP_DEL_SERVIDOR:~/.ssh/authorized_keys
+
+# Probar conexión sin contraseña:
+ssh usuario@IP_DEL_SERVIDOR
